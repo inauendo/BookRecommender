@@ -7,9 +7,9 @@ class BookRecommender:
         self.tag_num = tag_num
 
         print("reading data...")
-        self.book_data = np.loadtxt('books.csv', dtype=str, delimiter=',', skiprows=1, usecols=(1, 7, 10), encoding='utf-8', comments=None, quotechar='"')
-        self.tag_data = np.loadtxt('book_tags.csv', dtype=int, delimiter=',', skiprows=1)
-        self.tag_info = np.loadtxt('tags.csv', dtype=str, delimiter=',', skiprows=1, encoding='utf-8')
+        self.book_data = np.loadtxt('data/books.csv', dtype=str, delimiter=',', skiprows=1, usecols=(1, 7, 10), encoding='utf-8', comments=None, quotechar='"')
+        self.tag_data = np.loadtxt('data/book_tags.csv', dtype=int, delimiter=',', skiprows=1)
+        self.tag_info = np.loadtxt('data/tags.csv', dtype=str, delimiter=',', skiprows=1, encoding='utf-8')
 
         print("preprocessing tag data...")
         tag_data_sorted = self.tag_data[np.argsort(self.tag_data[:,1])]
@@ -67,7 +67,7 @@ class BookRecommender:
             print(" +++ {title} by {author}".format(title=self.book_data[index,2], author=self.book_data[index,1]))
 
 if __name__ == '__main__':
-    R = BookRecommender()
+    R = BookRecommender(tag_num=300)
     while(True):
         x = input("Please enter a valid book id for which you would like to receive recommendations. Enter 'x' to quit.\n")
         if x == 'x':

@@ -2,8 +2,41 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
 class BookRecommender:
+    '''Book recommender class. Uses the data stored in /data to recommend similar books by comparing tags goodreads users have labelled the book with.
+    
+    attributes
+    ----------
+    tag_num: int
+        The number of book tags to use for book comparisons. Only the most popular tags are used.
 
-    def __init__(self, tag_num = 100):
+    book_data: np.array
+        Array containing relevant information on the books in the dataset.
+
+    tag_data: np.array
+        Array containing data about which book has been labeled with which tag.
+
+    tag_info: np.array
+        Array holding tag ids and corresponding tag names.
+
+    tag_counts: np.array
+        Array counting total tag appearances.
+
+    book_dir_vecs: dict
+        Dict holding direction vectors for all books in the database.
+    
+    methods
+    -------
+    make_dir_vector(book_id : int) -> np.array
+        Creates a direction vector for a book given its id.
+
+    get_recom_matrix(self, dir_vec: np.array) -> np.array:
+        returns recommendation matrix with book ids in first column, cosine similarities in the second.
+
+    recommend(self, book_id : int, rec_num : int = 5) -> None:
+        prints book recommendations given a book id.
+    '''
+
+    def __init__(self, tag_num : int = 100):
         self.tag_num = tag_num
 
         print("reading data...")
@@ -26,7 +59,20 @@ class BookRecommender:
 
         print("---------------------------")
 
-    def make_dir_vector(self, book_id):
+    def make_dir_vector(self, book_id: int) -> np.array:
+        '''Creates a 'direciton vector' for a book given its id. The direction vector encodes information about which tags the book is labeled with.
+        
+        parameters
+        ---------
+        book_id: int
+            id of the book.
+
+        returns
+        -------
+        dir_vec: np.array of length self.tag_num
+            direction vector encoding which tags the book has been labeled with.
+        '''
+
         dir_vec = np.zeros(self.tag_num, dtype=int)     #the direction vector
 
         #find the relevant part of the book_data
@@ -41,8 +87,20 @@ class BookRecommender:
 
         return dir_vec
 
-    def get_recom_matrix(self, dir_vec):
-        '''returns matrix with book ids in first col, cosine similarities in the second'''
+    def get_recom_matrix(self, dir_vec: np.array) -> np.array:
+        '''returns recommendation matrix with book ids in first column, cosine similarities in the second.
+        
+        parameters
+        ----------
+        dir_vec: np.array
+            direction vector as returned by make_dir_vector.
+
+        returns
+        -------
+        res: np.array
+            recommendation matrix with book ids in first column, cosine similarities in the second, sorted by cosine similarity.
+        '''
+
         X = dir_vec.reshape(1,-1)
         Y = [item for item in self.book_dir_vecs.values()]
         sim = cosine_similarity(X,Y)[0]
@@ -51,8 +109,22 @@ class BookRecommender:
             res[i, 1] = sim[i]
         return res[np.argsort(res[:,1])[-1::-1]]
     
-    def recommend(self, book_id, rec_num = 5):
-        '''prints book recommendations given a book id.'''
+    def recommend(self, book_id : int, rec_num : int = 5) -> None:
+        '''prints book recommendations given a book id.
+        
+        parameters
+        ----------
+        book_id: int
+            id of the book for which to give recommendations.
+
+        rec_num: int, optional
+            number of recommendations to print.
+
+        returns
+        -------
+        None
+        '''
+
         try:
             curr_index = np.argwhere(self.book_data[:,0] == str(book_id))[0][0]
         except IndexError:
